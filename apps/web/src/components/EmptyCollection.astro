@@ -1,0 +1,14 @@
+---
+import Paperclip from "@/components/Paperclip.astro";
+import { withBase } from "@/lib/paths.mjs";
+---
+<section class="empty-collection">
+  <div class="empty-mark"><Paperclip /></div>
+  <h2>Your first clip goes here.</h2>
+  <p>Set up Cliplink, then save something you want to come back to. Your collection grows with each clip.</p>
+  <code class="example-command">clip https://example.com</code>
+  <div class="empty-actions">
+    <a class="button" href="https://github.com/iamrajjoshi/cliplink-template#quick-start">Set up your collection</a>
+    <a href={withBase("/demo/")}>See example clips</a>
+  </div>
+</section>

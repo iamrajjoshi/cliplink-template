@@ -1,12 +1,20 @@
 ---
 import Base from "@/layouts/Base.astro";
 import ClipFeed from "@/components/ClipFeed.astro";
+import EmptyCollection from "@/components/EmptyCollection.astro";
 import { sortClips } from "@/lib/clips";
 import { getClipEntries } from "@/lib/content";
+import site from "../../../../site.config.mjs";
 
 const clips = sortClips(await getClipEntries());
 ---
 
-<Base title="clip" description="things i found interesting, stored." pathname="/">
-  <ClipFeed clips={clips} />
+<Base>
+  <div class:list={{ "empty-home": clips.length === 0 }}>
+    <div class="page-intro">
+      <h1>{site.title}</h1>
+      <p>{site.description}</p>
+    </div>
+    {clips.length ? <ClipFeed clips={clips} /> : <EmptyCollection />}
+  </div>
 </Base>

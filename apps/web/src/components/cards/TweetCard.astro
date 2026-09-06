@@ -1,57 +1,27 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import CardShell from "@/components/cards/CardShell.astro";
 import EntryBody from "@/components/EntryBody.astro";
-import { formatDate } from "@/lib/clips";
-
-const { entry } = Astro.props as { entry: CollectionEntry<"clips"> };
-
-if (entry.data.kind !== "tweet") {
-  throw new Error("TweetCard received a non-tweet entry.");
-}
+import { formatDate, type ClipEntry } from "@/lib/clips";
+import { withBase } from "@/lib/paths.mjs";
+const { entry } = Astro.props as { entry: ClipEntry };
+if (entry.data.kind !== "tweet") throw new Error("TweetCard received a non-tweet entry.");
+const example = entry.collection === "examples";
 ---
 
 <CardShell entry={entry}>
-  <div class="flex items-start gap-4">
-    {entry.data.author.avatar && (
-      <img
-        src={entry.data.author.avatar}
-        alt=""
-        class="mt-1 h-10 w-10 border border-[var(--border)] object-cover"
-        loading="lazy"
-      />
-    )}
-    <div class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <p class="text-xl font-semibold">{entry.data.author.name}</p>
-        <p class="text-sm text-[var(--text-muted)]">@{entry.data.author.handle}</p>
-      </div>
+  <div class="post-author">
+    {entry.data.author.avatar && <img src={withBase(entry.data.author.avatar)} alt="" width="36" height="36" loading="lazy" />}
+    <div>
+      <strong>{entry.data.author.name}</strong>
+      <span>@{entry.data.author.handle}</span>
     </div>
   </div>
-  <div class="mt-4">
-    <p class="whitespace-pre-wrap text-base leading-[1.5]">{entry.data.text}</p>
-    {entry.data.media?.length ? (
-      <div class="mt-5 grid gap-3 sm:grid-cols-2">
-        {entry.data.media.map((media) => (
-          <img
-            src={media.src}
-            alt={media.alt ?? ""}
-            class="w-full border border-[var(--border)] object-cover"
-            loading="lazy"
-          />
-        ))}
-      </div>
-    ) : null}
-    <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-[var(--text-muted)]">
-      <a href={entry.data.url} target="_blank" rel="noreferrer">
-        open on x
-      </a>
-      <span>{formatDate(entry.data.postedAt)}</span>
-    </div>
-  </div>
-  {entry.body?.trim() && (
-    <div slot="commentary" class="mt-4 border-t border-[var(--border)] pt-4">
-      <EntryBody entry={entry} />
+  <blockquote class="post-text">{entry.data.text}</blockquote>
+  {entry.data.media?.length && (
+    <div class="post-media">
+      {entry.data.media.map((media) => <img src={withBase(media.src)} alt={media.alt ?? ""} loading="lazy" />)}
     </div>
   )}
+  {!example && <a class="post-source" href={entry.data.url} target="_blank" rel="noreferrer">View post on X, {formatDate(entry.data.postedAt)}</a>}
+  <EntryBody entry={entry} slot="commentary" />
 </CardShell>

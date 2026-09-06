@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Gabarito";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("./gabarito-latin-variable.woff2") format("woff2");
+}

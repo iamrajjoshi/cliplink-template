@@ -1,41 +1,66 @@
 ---
 import type { ClipEntry } from "@/lib/clips";
-import LinkCard from "@/components/cards/LinkCard.astro";
-import TweetCard from "@/components/cards/TweetCard.astro";
-import ImageCard from "@/components/cards/ImageCard.astro";
-import VideoCard from "@/components/cards/VideoCard.astro";
-import NoteCard from "@/components/cards/NoteCard.astro";
+import ClipCard from "@/components/ClipCard.astro";
 
-const { clips, emptyMessage = "nothing here yet." } = Astro.props as {
-  clips: ClipEntry[];
-  emptyMessage?: string;
-};
+const { clips } = Astro.props as { clips: ClipEntry[] };
+const hasFilters = clips.length >= 5;
 ---
 
-<section class="page-shell pb-4 pt-0">
-  {clips.length ? (
-    <div class="pt-0">
-      {clips.map((clip) => {
-        if (clip.data.kind === "link") {
-          return <LinkCard entry={clip} />;
-        }
-
-        if (clip.data.kind === "tweet") {
-          return <TweetCard entry={clip} />;
-        }
-
-        if (clip.data.kind === "image") {
-          return <ImageCard entry={clip} />;
-        }
-
-        if (clip.data.kind === "video") {
-          return <VideoCard entry={clip} />;
-        }
-
-        return <NoteCard entry={clip} />;
-      })}
-    </div>
-  ) : (
-    <div class="section-block py-6 text-[var(--text-muted)]">{emptyMessage}</div>
+<section aria-label="Clips" class="clip-feed" data-clip-feed>
+  {hasFilters && (
+    <form class="feed-tools" role="search" hidden>
+      <label class="search-field">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6" /><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        <span class="sr-only">Search clips</span>
+        <input type="search" name="q" placeholder="Find a clip…" autocomplete="off" />
+      </label>
+      <label class="kind-field">
+        <span class="sr-only">Filter by kind</span>
+        <select name="kind">
+          <option value="">All kinds</option>
+          <option value="link">Links</option>
+          <option value="note">Notes</option>
+          <option value="image">Images</option>
+          <option value="tweet">Posts</option>
+          <option value="video">Videos</option>
+        </select>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </label>
+    </form>
   )}
+  <div class="clip-list">
+    {clips.map((clip) => <ClipCard entry={clip} />)}
+  </div>
+  <p class="search-result" aria-live="polite" hidden></p>
+  <p class="no-results" hidden>No clips match. Try another word or choose a different kind.</p>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-clip-feed]").forEach((feed) => {
+    const form = feed.querySelector<HTMLFormElement>(".feed-tools");
+    if (!form) return;
+    const search = form.querySelector<HTMLInputElement>('input[name="q"]')!;
+    const kind = form.querySelector<HTMLSelectElement>('select[name="kind"]')!;
+    const cards = [...feed.querySelectorAll<HTMLElement>("[data-clip]")];
+    const status = feed.querySelector<HTMLElement>(".search-result")!;
+    const empty = feed.querySelector<HTMLElement>(".no-results")!;
+    const searchText = cards.map((card) => card.textContent?.toLocaleLowerCase() ?? "");
+    form.hidden = false;
+    form.addEventListener("submit", (event) => event.preventDefault());
+    function filter() {
+      const query = search.value.trim().toLocaleLowerCase();
+      let visible = 0;
+      cards.forEach((card, index) => {
+        card.hidden = Boolean((kind.value && card.dataset.kind !== kind.value) || !searchText[index]?.includes(query));
+        if (!card.hidden) visible++;
+      });
+      status.hidden = !query && !kind.value;
+      status.textContent = `${visible} ${visible === 1 ? "clip" : "clips"} found`;
+      empty.hidden = visible > 0;
+    }
+    search.addEventListener("input", filter);
+    kind.addEventListener("change", filter);
+    window.addEventListener("pageshow", filter);
+    filter();
+  });
+</script>

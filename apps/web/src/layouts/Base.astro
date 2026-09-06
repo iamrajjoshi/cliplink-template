@@ -1,73 +1,119 @@
 ---
 import "@/styles/global.css";
+import Paperclip from "@/components/Paperclip.astro";
+import { absoluteUrl, withBase } from "@/lib/paths.mjs";
+import site from "../../../../site.config.mjs";
 
-const siteTitle = "clip";
-
-const {
-  title = siteTitle,
-  description = "things i found interesting, stored.",
-  headerDescription = description,
-  image,
-  pathname = "/",
-} = Astro.props as {
+interface Props {
   title?: string;
   description?: string;
-  headerDescription?: string | null;
   image?: string;
   pathname?: string;
-};
+  noindex?: boolean;
+}
 
-const canonical = new URL(pathname, Astro.site);
-const socialImage = image ? new URL(image, Astro.site).toString() : undefined;
-const rssFeed = new URL("/rss.xml", Astro.site).toString();
+const {
+  title = site.title,
+  description = site.description,
+  image,
+  pathname = "/",
+  noindex = false,
+} = Astro.props;
+const canonical = absoluteUrl(pathname);
+const socialImage = image ? absoluteUrl(image) : absoluteUrl("/social.svg");
 const commitSha = import.meta.env.PUBLIC_COMMIT_SHA ?? "dev";
-const commitHref = `https://github.com/iamrajjoshi/clip/commit/${commitSha}`;
-const pageTitle = title === siteTitle ? siteTitle : `${title} | ${siteTitle}`;
+const repoUrl = site.repo ? `https://github.com/${site.repo}` : undefined;
+const pageTitle = title === site.title ? site.title : `${title} · ${site.title}`;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <script is:inline>
+      document.documentElement.classList.add("js");
+      try {
+        const saved = localStorage.getItem("cliplink-theme");
+        const theme = saved === "light" || saved === "dark"
+          ? saved
+          : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#000000" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href={canonical.toString()} />
-    <link rel="alternate" type="application/rss+xml" title="clip rss" href={rssFeed} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#FFFDF6" />
+    <link rel="icon" href={withBase("/favicon.svg")} type="image/svg+xml" />
+    <link rel="preload" href={withBase("/fonts/gabarito-latin-variable.woff2")} as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href={withBase("/fonts/fonts.css")} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={site.title} href={absoluteUrl("/rss.xml")} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical.toString()} />
-    {socialImage && <meta property="og:image" content={socialImage} />}
-    <meta name="twitter:card" content={socialImage ? "summary_large_image" : "summary"} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
-    {socialImage && <meta name="twitter:image" content={socialImage} />}
+    <meta name="twitter:image" content={socialImage} />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header page-shell">
-      <p class="text-sm font-semibold">clip.rajjoshi.me</p>
-      {headerDescription && <p class="mt-2 text-sm text-[var(--text-muted)]">{headerDescription}</p>}
+      <a class="site-identity" href={withBase("/")} aria-label={`${site.owner}, all clips`}>
+        <Paperclip />
+        <span>{site.owner}</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href={withBase("/rss.xml")}>RSS</a>
+        <button class="theme-toggle" type="button" aria-label="Switch to dark mode" hidden>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6" />
+            <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" />
+          </svg>
+        </button>
+      </nav>
     </header>
-    <main>
+    <main id="main" class="page-shell">
       <slot />
     </main>
     <footer class="site-footer page-shell">
-      <div class="nav-row justify-center text-sm text-[var(--text-muted)]">
-        <a href={commitHref} target="_blank" rel="noreferrer">
-          {commitSha}
-        </a>
-        <span class="nav-divider">|</span>
-        <a href="https://github.com/iamrajjoshi" target="_blank" rel="noreferrer">
-          iamrajjoshi
-        </a>
-        <span class="nav-divider">|</span>
-        <a href="/rss.xml">
-          rss
-        </a>
-      </div>
+      <a class="footer-credit" href="https://github.com/iamrajjoshi/cliplink">Made with Cliplink</a>
+      {repoUrl && <a class="commit-link" href={`${repoUrl}/commit/${commitSha}`} aria-label={`Source, commit ${commitSha}`}>{commitSha}</a>}
     </footer>
+    <script>
+      const root = document.documentElement;
+      const toggle = document.querySelector<HTMLButtonElement>(".theme-toggle");
+      const preference = matchMedia("(prefers-color-scheme: dark)");
+      function updateTheme() {
+        const dark = root.dataset.theme
+          ? root.dataset.theme === "dark"
+          : preference.matches;
+        toggle?.setAttribute("aria-label", `Switch to ${dark ? "light" : "dark"} mode`);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#261F24" : "#FFFDF6");
+      }
+      if (toggle) {
+        toggle.hidden = false;
+        toggle.addEventListener("click", () => {
+          const dark = root.dataset.theme ? root.dataset.theme === "dark" : preference.matches;
+          root.dataset.theme = dark ? "light" : "dark";
+          try { localStorage.setItem("cliplink-theme", root.dataset.theme); } catch {}
+          updateTheme();
+        });
+      }
+      preference.addEventListener("change", () => {
+        let saved: string | null = null;
+        try { saved = localStorage.getItem("cliplink-theme"); } catch {}
+        if (saved !== "dark" && saved !== "light") {
+          root.dataset.theme = preference.matches ? "dark" : "light";
+          updateTheme();
+        }
+      });
+      updateTheme();
+    </script>
   </body>
 </html>

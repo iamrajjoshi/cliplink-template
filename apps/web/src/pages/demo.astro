@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import ClipFeed from "@/components/ClipFeed.astro";
+import { sortClips } from "@/lib/clips";
+import { withBase } from "@/lib/paths.mjs";
+const clips = sortClips(await getCollection("examples"));
+---
+<Base title="Example collection" description="A preview of the five kinds of clips. All content on this page is fictional." pathname="/demo/" noindex>
+  <a class="back-link" href={withBase("/")}>Your collection</a>
+  <div class="page-intro demo-intro">
+    <h1>A little of everything.</h1>
+    <p>A link, a post, an image, a video, and a note. Try searching this fictional collection; these clips won’t appear in your site or RSS feed.</p>
+  </div>
+  <ClipFeed clips={clips} />
+</Base>

@@ -33,6 +33,7 @@ jobs:
           cache: pnpm
 
       - name: Configure Pages
+        id: pages
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
@@ -41,8 +42,8 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          PUBLIC_SENTRY_DSN: ${{ vars.PUBLIC_SENTRY_DSN }}
+          CLIP_SITE_URL: ${{ steps.pages.outputs.origin }}
+          CLIP_BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

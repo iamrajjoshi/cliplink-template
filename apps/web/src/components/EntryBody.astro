@@ -1,17 +1,10 @@
 ---
-import { render, type CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import type { ClipEntry } from "@/lib/clips";
 
-const { entry } = Astro.props as { entry: CollectionEntry<"clips"> };
-const hasBody = (entry.body?.trim().length ?? 0) > 0;
-let Content: Awaited<ReturnType<typeof render>>["Content"] | null = null;
-
-if (hasBody) {
-  ({ Content } = await render(entry));
-}
+const { entry } = Astro.props as { entry: ClipEntry };
+const hasBody = Boolean(entry.body?.trim());
+const rendered = hasBody ? await render(entry) : undefined;
+const Content = rendered?.Content;
 ---
-
-{hasBody && Content && (
-  <div class="markdown-body">
-    <Content />
-  </div>
-)}
+{Content && <div class="markdown-body"><Content /></div>}

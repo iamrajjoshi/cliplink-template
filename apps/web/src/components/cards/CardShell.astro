@@ -1,20 +1,27 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import { formatDate, getClipPermalink } from "@/lib/clips";
-
-const { entry } = Astro.props as { entry: CollectionEntry<"clips"> };
-const permalink = getClipPermalink(entry);
+import { formatDate, getClipPermalink, type ClipEntry } from "@/lib/clips";
+import { withBase } from "@/lib/paths.mjs";
+const { entry } = Astro.props as { entry: ClipEntry };
+const example = entry.collection === "examples";
+const label = entry.data.kind === "tweet" ? "Post" : entry.data.kind.charAt(0).toUpperCase() + entry.data.kind.slice(1);
 ---
 
-<article class="card-surface">
-  <div class="flex items-center justify-between gap-4 text-[12px] text-[var(--text-muted)]">
-    <span>{entry.data.kind}</span>
-    <a href={permalink}>
-      {formatDate(entry.data.clippedAt)}
+<article class="clip-card" data-clip data-kind={entry.data.kind} id={example ? entry.slug : undefined}>
+  <div class="clip-meta">
+    <a href={example ? `#${entry.slug}` : withBase(getClipPermalink(entry))} aria-label={`Permalink, ${formatDate(entry.data.clippedAt)}`}>
+      <time datetime={entry.data.clippedAt.toISOString()}>{formatDate(entry.data.clippedAt)}</time>
     </a>
+    <span>{label}</span>
   </div>
-  <div class="mt-4">
-    <slot />
-  </div>
-  <slot name="commentary" />
+  <div class="clip-content"><slot /></div>
+  {entry.body?.trim() && entry.data.kind !== "note" && (
+    <aside class="clip-commentary" aria-label={example ? "Example note" : "Personal note"}>
+      <slot name="commentary" />
+    </aside>
+  )}
+  {entry.data.tags.length > 0 && (
+    <ul class="clip-tags" aria-label="Tags">
+      {entry.data.tags.map((tag) => <li>#{tag}</li>)}
+    </ul>
+  )}
 </article>

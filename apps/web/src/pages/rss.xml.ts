@@ -1,20 +1,20 @@
-import type { APIContext } from "astro";
 import rss from "@astrojs/rss";
 import { getClipDescription, getClipPermalink, getClipTitle, sortClips } from "@/lib/clips";
 import { getClipEntries } from "@/lib/content";
+import { absoluteUrl } from "@/lib/paths.mjs";
+import site from "../../../../site.config.mjs";
 
-export async function GET(context: APIContext) {
+export async function GET() {
   const clips = sortClips(await getClipEntries());
-
   return rss({
-    title: "clip",
-    description: "things i found interesting, stored.",
-    site: context.site!,
+    title: site.title,
+    description: site.description,
+    site: absoluteUrl("/"),
     items: clips.map((clip) => ({
       title: getClipTitle(clip),
       description: getClipDescription(clip),
       pubDate: clip.data.clippedAt,
-      link: getClipPermalink(clip),
+      link: absoluteUrl(getClipPermalink(clip)),
     })),
   });
 }

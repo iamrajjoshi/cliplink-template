@@ -1,42 +1,22 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import CardShell from "@/components/cards/CardShell.astro";
 import EntryBody from "@/components/EntryBody.astro";
-
-const { entry } = Astro.props as { entry: CollectionEntry<"clips"> };
-
-if (entry.data.kind !== "video") {
-  throw new Error("VideoCard received a non-video entry.");
-}
+import type { ClipEntry } from "@/lib/clips";
+import { withBase } from "@/lib/paths.mjs";
+const { entry } = Astro.props as { entry: ClipEntry };
+if (entry.data.kind !== "video") throw new Error("VideoCard received a non-video entry.");
+const provider = { youtube: "YouTube", vimeo: "Vimeo", other: "Video" }[entry.data.provider];
+const example = entry.collection === "examples";
 ---
 
 <CardShell entry={entry}>
-  <div class="grid gap-4 sm:grid-cols-[1fr_160px] sm:items-start">
+  <div class:list={["link-preview", { "has-thumbnail": entry.data.thumbnail }]}>
     <div>
-      <p class="section-kicker">{entry.data.provider}</p>
-      <h2 class="mt-3 text-[28px] leading-[1.2] font-semibold">
-        <a href={entry.data.url} target="_blank" rel="noreferrer">
-          {entry.data.title}
-        </a>
-      </h2>
-      <p class="mt-3 text-sm text-[var(--text-muted)]">
-        {entry.data.channel ? `${entry.data.channel} on ${entry.data.provider}` : `saved from ${entry.data.provider}`}
-      </p>
-      <div class="mt-4">
-        <a href={entry.data.url} target="_blank" rel="noreferrer" class="tag-chip">
-          [watch]
-        </a>
-      </div>
+      <p class="clip-source">{entry.data.channel ?? provider}</p>
+      <h2 class="clip-title">{example ? entry.data.title : <a href={entry.data.url} target="_blank" rel="noreferrer">{entry.data.title}</a>}</h2>
+      {!example && <a class="post-source" href={entry.data.url} target="_blank" rel="noreferrer">Watch on {provider}</a>}
     </div>
-    {entry.data.thumbnail && (
-      <div class="overflow-hidden border border-[var(--border)]">
-        <img src={entry.data.thumbnail} alt="" class="h-full w-full object-cover" loading="lazy" />
-      </div>
-    )}
+    {entry.data.thumbnail && <img class="link-thumbnail" src={withBase(entry.data.thumbnail)} alt="" width="120" height="90" loading="lazy" />}
   </div>
-  {entry.body?.trim() && (
-    <div slot="commentary" class="mt-4 border-t border-[var(--border)] pt-4">
-      <EntryBody entry={entry} />
-    </div>
-  )}
+  <EntryBody entry={entry} slot="commentary" />
 </CardShell>

@@ -1,25 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title>clip</title>
-  <rect width="64" height="64" fill="#000000" />
-  <path
-    d="M18 12H40L50 22V52H14V12H18Z"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="4"
-    stroke-linejoin="miter"
-  />
-  <path
-    d="M40 12V22H50"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="4"
-    stroke-linejoin="miter"
-  />
-  <path
-    d="M24 30H40M24 38H40M24 46H34"
-    fill="none"
-    stroke="#ffffff"
-    stroke-width="4"
-    stroke-linecap="square"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <path d="M27 4H16a12 12 0 0 0 0 24h4a8 8 0 0 0 0-16h-4a4 4 0 0 0 0 8" stroke="#9D274B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

@@ -6,4 +6,5 @@ const clips = defineCollection({
   schema: clipDataSchema,
 });
 
-export const collections = { clips };
+const examples = defineCollection({ type: "content", schema: clipDataSchema });
+export const collections = { clips, examples };

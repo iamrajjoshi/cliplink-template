@@ -1,6 +1,7 @@
 import type { CollectionEntry } from "astro:content";
+import { withBase } from "./paths.mjs";
 
-export type ClipEntry = CollectionEntry<"clips">;
+export type ClipEntry = CollectionEntry<"clips"> | CollectionEntry<"examples">;
 type LinkClipData = Extract<ClipEntry["data"], { kind: "link" }>;
 
 function normalizeHostname(rawUrl: string) {
@@ -209,6 +210,6 @@ export function buildSearchIndex(clips: ClipEntry[]) {
     description: getClipDescription(clip),
     clippedAt: clip.data.clippedAt.toISOString(),
     tags: clip.data.tags,
-    permalink: getClipPermalink(clip),
+    permalink: withBase(getClipPermalink(clip)),
   }));
 }
