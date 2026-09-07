@@ -170,9 +170,25 @@ main {
   border-radius: 50%;
   color: var(--text);
 }
-.theme-toggle svg {
-  width: 24px;
-  height: 24px;
+.theme-icon {
+  grid-area: 1 / 1;
+  width: 20px;
+  height: 20px;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+.theme-icon-moon {
+  opacity: 0;
+  transform: rotate(-25deg) scale(0.8);
+}
+.theme-toggle[data-theme-state="dark"] .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(25deg) scale(0.8);
+}
+.theme-toggle[data-theme-state="dark"] .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0) scale(1);
 }
 .theme-toggle:hover {
   background: var(--surface);

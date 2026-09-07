@@ -87,6 +87,12 @@ for (const base of ["/", "/saved/"]) {
         /class="footer-credit" href="https:\/\/github\.com\/iamrajjoshi\/cliplink"/,
       );
       assert.ok(homepage.includes('href="https://github.com/reader/clips/commit/dev"'));
+      const themeToggle = homepage.match(/<button class="theme-toggle"[^>]*>(.*?)<\/button>/s)?.[0];
+      assert.ok(themeToggle, "The shared header includes the theme toggle");
+      assert.match(themeToggle, /aria-label="Switch to dark mode"/);
+      assert.match(themeToggle, /class="theme-icon theme-icon-sun"/);
+      assert.match(themeToggle, /class="theme-icon theme-icon-moon"/);
+      assert.equal((themeToggle.match(/aria-hidden="true"/g) ?? []).length, 2);
 
       const search = JSON.parse(await readFile(path.join(output, "search.json"), "utf8"));
       assert.equal(search.length, 5);
