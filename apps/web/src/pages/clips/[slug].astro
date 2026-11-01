@@ -7,13 +7,13 @@ import { withBase } from "@/lib/paths.mjs";
 
 export async function getStaticPaths() {
   return (await getClipEntries()).map((clip) => ({
-    params: { slug: clip.slug },
+    params: { slug: clip.id },
     props: { clip },
   }));
 }
 const { clip } = Astro.props as { clip: ClipEntry };
 ---
-<Base title={getClipTitle(clip)} description={getClipDescription(clip)} image={getClipSocialImage(clip)} pathname={`/clips/${clip.slug}/`}>
+<Base title={getClipTitle(clip)} description={getClipDescription(clip)} image={getClipSocialImage(clip)} pathname={`/clips/${clip.id}/`}>
   <h1 class="sr-only">{getClipTitle(clip)}</h1>
   <a class="back-link" href={withBase("/")}>All clips</a>
   <div class="permalink"><ClipCard entry={clip} /></div>

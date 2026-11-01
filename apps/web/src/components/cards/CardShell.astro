@@ -6,9 +6,9 @@ const example = entry.collection === "examples";
 const label = entry.data.kind === "tweet" ? "Post" : entry.data.kind.charAt(0).toUpperCase() + entry.data.kind.slice(1);
 ---
 
-<article class="clip-card" data-clip data-kind={entry.data.kind} id={example ? entry.slug : undefined}>
+<article class="clip-card" data-clip data-kind={entry.data.kind} id={example ? entry.id : undefined}>
   <div class="clip-meta">
-    <a href={example ? `#${entry.slug}` : withBase(getClipPermalink(entry))} aria-label={`Permalink, ${formatDate(entry.data.clippedAt)}`}>
+    <a href={example ? `#${entry.id}` : withBase(getClipPermalink(entry))} aria-label={`Permalink, ${formatDate(entry.data.clippedAt)}`}>
       <time datetime={entry.data.clippedAt.toISOString()}>{formatDate(entry.data.clippedAt)}</time>
     </a>
     <span>{label}</span>

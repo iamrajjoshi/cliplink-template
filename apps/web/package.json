@@ -11,9 +11,10 @@
     "test": "tsx --test src/test/*.test.ts"
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.18",
-    "cliplink-schema": "^0.1.0",
-    "astro": "^5.18.1"
+    "@astrojs/markdown-remark": "^7.3.9",
+    "@astrojs/rss": "^4.0.19",
+    "astro": "^7.4.4",
+    "cliplink-schema": "^0.1.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8"
