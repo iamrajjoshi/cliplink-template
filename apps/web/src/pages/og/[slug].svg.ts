@@ -5,7 +5,7 @@ import { socialImage } from "@/lib/social";
 
 export async function getStaticPaths() {
   return (await getClipEntries()).map((clip) => ({
-    params: { slug: clip.slug },
+    params: { slug: clip.id },
     props: { clip },
   }));
 }

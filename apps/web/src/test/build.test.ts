@@ -38,7 +38,7 @@ for (const base of ["/", "/saved/"]) {
       async function build(): Promise<void> {
         await exec(
           process.execPath,
-          [path.join(project, "apps/web/node_modules/astro/astro.js"), "build"],
+          [path.join(project, "apps/web/node_modules/astro/bin/astro.mjs"), "build"],
           {
             cwd: app,
             env: {
